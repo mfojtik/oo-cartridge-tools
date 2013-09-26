@@ -1,0 +1,31 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'commander/import'
+
+require_relative '../lib/openshift/cartridge_utils'
+
+program :name, 'OpenShift cartridge lint'
+program :version, '1.0.0'
+program :description, 'Validate the OpenShift cartridge'
+
+command :manifest do |c|
+  c.syntax = 'manifest'
+  c.description = 'Validates the manifest.yml'
+  c.option '--file STRING', String, 'The manifest.yml path (default: ./metadata/manifest.yml'
+  c.option '--schema STRING', String, 'Override the manifest.yaml kwalify schema'
+
+  c.action do |_, options|
+    manifest_file = OpenShift::CartridgeUtils::Lint.guess_manifest_path(options.file)
+    schema_file = OpenShift::CartridgeUtils::Lint.guess_schema_path(options.schema)
+    result = OpenShift::CartridgeUtils::Lint.parse(manifest_file, schema_file)
+    if result.errors?
+      say "[#{manifest_file}] INVALID"
+      result.errors.each { |e| say "  [#{e.path}] - #{e.message}" }
+      exit(1)
+    else
+      say "[#{manifest_file}] VALID"
+    end
+  end
+
+end
