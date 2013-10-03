@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'commander/import'
+
+require_relative '../lib/openshift/cartridge_tools'
+
+program :name, 'OpenShift DIY cartridge creator'
+program :version, '1.0.0'
+program :description, 'Bootstrap a new DIY cartridge'
+
+command :diy do |c|
+  c.syntax = 'diy'
+  c.description = 'Create new cartridge based on the official OpenShift DIY cartridge'
+  c.option '--name NAME', String, 'Name of the new cartridge (eg. openshift-redis-cartridge)'
+
+  c.action do |_, options|
+    unless options.name
+      say "ERROR: Please specify the cartridge name using --name option."
+      exit(255)
+    end
+    OpenShift::CartridgeTools::Diy.init_cartridge_dir(options.name)
+    opts = {}
+    opts[:short_name] = ask('Cartridge-Short-Name (eg. "redis"): ')
+    opts[:version] = ask('Version: ')
+    OpenShift::CartridgeTools::Diy.parse_bin(options.name, opts)
+    OpenShift::CartridgeTools::Diy.parse_docs(options.name, opts)
+    OpenShift::CartridgeTools::Diy.parse_spec(options.name, opts)
+    OpenShift::CartridgeTools::Diy.parse_manifest(options.name, opts)
+    OpenShift::CartridgeTools::Diy.git_keep(options.name)
+    say "The './#{options.name}/' cartridge was succesfully created..."
+  end
+
+end

@@ -1,0 +1,57 @@
+#!/bin/bash
+source $OPENSHIFT_CARTRIDGE_SDK_BASH
+
+function run_hook() {
+  local path="$OPENSHIFT_REPO_DIR/.openshift/action_hooks/$1"
+  if [ -f "$path" -a -x "$path" ]
+  then
+    "$path"
+  else
+    return 0
+  fi
+}
+
+function start() {
+    echo "Starting <%=options[:short_name]%> cartridge"
+    run_hook start
+}
+
+function stop() {
+    echo "Stopping <%=options[:short_name]%> cartridge"
+    run_hook stop
+}
+
+function restart() {
+    stop
+    start
+}
+
+function status() {
+   if output=$(curl http://$OPENSHIFT_<%=options[:short_name].upcase%>_IP:$OPENSHIFT_<%=options[:short_name].upcase%>_PORT 2>&1 )
+   then
+      client_result "Application is running"
+   else
+      client_result "Application is either stopped or inaccessible"
+   fi
+}
+
+function reload() {
+    client_result "Reloading <%=options[:short_name]%> cart"
+    restart
+}
+
+function tidy() {
+  client_message "Emptying log dir: $OPENSHIFT_<%=options[:short_name].upcase%>_LOG_DIR"
+  shopt -s dotglob
+  rm -rf $OPENSHIFT_<%=options[:short_name]%>_LOG_DIR/*
+}
+
+case "$1" in
+  start)     start ;;
+  stop)      stop ;;
+  restart)   restart ;;
+  status)    status ;;
+  reload)    reload ;;
+  tidy)      tidy ;;
+  *)         exit 0
+esac

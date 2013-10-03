@@ -3,7 +3,7 @@
 require 'rubygems'
 require 'commander/import'
 
-require_relative '../lib/openshift/cartridge_utils'
+require_relative '../lib/openshift/cartridge_tools'
 
 program :name, 'OpenShift cartridge lint'
 program :version, '1.0.0'
@@ -16,9 +16,9 @@ command :manifest do |c|
   c.option '--schema STRING', String, 'Override the manifest.yaml kwalify schema'
 
   c.action do |_, options|
-    manifest_file = OpenShift::CartridgeUtils::Lint.guess_manifest_path(options.file)
-    schema_file = OpenShift::CartridgeUtils::Lint.guess_schema_path(options.schema)
-    result = OpenShift::CartridgeUtils::Lint.parse(manifest_file, schema_file)
+    manifest_file = OpenShift::CartridgeTools::Lint.guess_manifest_path(options.file)
+    schema_file = OpenShift::CartridgeTools::Lint.guess_schema_path(options.schema)
+    result = OpenShift::CartridgeTools::Lint.parse(manifest_file, schema_file)
     if result.errors?
       say "[#{manifest_file}] INVALID"
       result.errors.each { |e| say "  [#{e.path}] - #{e.message}" }

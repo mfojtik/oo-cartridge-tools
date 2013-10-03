@@ -2,7 +2,7 @@ require 'yaml'
 require 'kwalify'
 
 module OpenShift
-  module CartridgeUtils
+  module CartridgeTools
 
     class Lint
 
