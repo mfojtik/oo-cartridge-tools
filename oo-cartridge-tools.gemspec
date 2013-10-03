@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
 
   s.name         = 'oo-cartridge-tools'
-  s.version      = '0.1'
+  s.version      = '0.2'
   s.summary      = "OpenShift Cartridge utilities"
   s.description  = "Various utilities to help with OpenShift cartridge development"
   s.authors      = ["Michal Fojtik"]
